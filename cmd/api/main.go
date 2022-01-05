@@ -1,17 +1,24 @@
 package main
 
 import (
-	"encoding/json"
+	"github.com/devemio/go-rest-api/cmd/api/users"
 	"github.com/devemio/go-rest-api/internal/infrastructure/middleware"
+	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 )
 
 func main() {
 	log.Println("Start application")
-	http.HandleFunc("/", middleware.Cors(middleware.ContentType(handler)))
 
-	log.Fatal(http.ListenAndServe("0.0.0.0:8080", nil))
+	r := mux.NewRouter()
+
+	r.HandleFunc("/users", handle(users.Get)).Methods("GET")
+	r.HandleFunc("/users/{id}", handle(users.Find)).Methods("GET")
+	r.HandleFunc("/users", handle(users.Create)).Methods("POST")
+	r.HandleFunc("/users/{id}", handle(users.Delete)).Methods("DELETE")
+
+	log.Fatal(http.ListenAndServe("0.0.0.0:8080", r))
 
 	//app := application.New(config.New())
 	//if err := app.Start(); err != nil {
@@ -23,16 +30,11 @@ func main() {
 	//fmt.Println(c.Contains("test"))
 }
 
-type DtoOut struct {
-	Message string `json:"message"`
-}
-
-func handler(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	log.Println("API call")
-	dto := &DtoOut{
-		Message: "success",
+func handle(next http.HandlerFunc) http.HandlerFunc {
+	middlewares := []middleware.Middleware{
+		middleware.Cors,
+		middleware.ContentType,
 	}
-	json.NewEncoder(w).Encode(dto)
-	log.Println("API call END")
+
+	return middleware.Apply(next, middlewares...)
 }
