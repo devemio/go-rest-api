@@ -1,11 +1,13 @@
 package main
 
 import (
-	"github.com/devemio/go-rest-api/internal/infrastructure/middleware"
-	"github.com/devemio/go-rest-api/internal/infrastructure/routing"
-	"github.com/gorilla/mux"
 	"log"
 	"net/http"
+
+	"github.com/gorilla/mux"
+
+	"github.com/devemio/go-rest-api/internal/infrastructure/middleware"
+	"github.com/devemio/go-rest-api/internal/infrastructure/routing"
 )
 
 var Route *routing.Route
