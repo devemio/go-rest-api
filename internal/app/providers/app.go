@@ -11,8 +11,9 @@ type app struct {
 }
 
 type Ctrls struct {
-	Ping *controllers.PingPongCtrl
-	User *controllers.UserCtrl
+	Ping  *controllers.PingPongCtrl
+	User  *controllers.UserCtrl
+	Image *controllers.ImageCtrl
 }
 
 type _repos struct {
@@ -29,6 +30,10 @@ func App() *app {
 			Ping: &controllers.PingPongCtrl{},
 			User: &controllers.UserCtrl{
 				Repo: repos.User,
+			},
+			Image: &controllers.ImageCtrl{
+				Repo:    repos.User,
+				Service: &users.Service{},
 			},
 		},
 	}

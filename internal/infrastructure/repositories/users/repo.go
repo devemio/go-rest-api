@@ -11,11 +11,31 @@ var users = []domain.User{
 		ID:           1,
 		Username:     "A",
 		EmailAddress: "a@gmai.com",
+		Images: []domain.Image{
+			{
+				ID:  1,
+				Url: "https://images.com/001.jpg",
+			},
+			{
+				ID:  2,
+				Url: "https://images.com/002.jpg",
+			},
+		},
 	},
 	{
 		ID:           2,
 		Username:     "B",
 		EmailAddress: "b@gmai.com",
+		Images: []domain.Image{
+			{
+				ID:  3,
+				Url: "https://images.com/003.jpg",
+			},
+			{
+				ID:  4,
+				Url: "https://images.com/004.jpg",
+			},
+		},
 	},
 }
 

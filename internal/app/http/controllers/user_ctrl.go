@@ -44,11 +44,9 @@ func (c *UserCtrl) Get() (*usersOut, error) {
 }
 
 func (c *UserCtrl) Find(r *http.Request) (*userOut, error) {
-	params := routing.Vars(r)
-
-	id, err := strconv.ParseInt(params["id"], 10, 64)
+	id, err := getUserID(r)
 	if err != nil {
-		return nil, handlers.ErrValidation("id should be int")
+		return nil, err
 	}
 
 	entity, err := c.Repo.Find(id)
@@ -90,11 +88,9 @@ func (c *UserCtrl) Create(in *createUserIn) (*handlers.Response, error) {
 }
 
 func (c *UserCtrl) Delete(r *http.Request) (*handlers.Response, error) {
-	params := routing.Vars(r)
-
-	id, err := strconv.ParseInt(params["id"], 10, 64)
+	id, err := getUserID(r)
 	if err != nil {
-		return nil, handlers.ErrValidation("id should be int")
+		return nil, err
 	}
 
 	if err = c.Repo.Delete(id); err != nil {
@@ -102,4 +98,15 @@ func (c *UserCtrl) Delete(r *http.Request) (*handlers.Response, error) {
 	}
 
 	return handlers.ResNoContent(), nil
+}
+
+func getUserID(r *http.Request) (int64, error) {
+	params := routing.Vars(r)
+
+	id, err := strconv.ParseInt(params["id"], 10, 64)
+	if err != nil {
+		return 0, handlers.ErrValidation("id should be int")
+	}
+
+	return id, nil
 }

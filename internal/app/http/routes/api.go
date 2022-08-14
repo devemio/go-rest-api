@@ -24,4 +24,6 @@ func register(r contracts.Router, c *providers.Ctrls) {
 	r.Get("/users/{id}", handlers.WrapGetWithReq(c.User.Find))
 	r.Post("/users", handlers.WrapPost(c.User.Create))
 	r.Delete("/users/{id}", handlers.WrapGetWithReq(c.User.Delete))
+
+	r.Get("/users/{id}/images", handlers.WrapGetWithReq(c.Image.Get))
 }
