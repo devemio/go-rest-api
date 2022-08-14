@@ -11,7 +11,7 @@ import (
 )
 
 type UserCtrl struct {
-	Repo users.UserRepoContract
+	Repo users.UserRepo
 }
 
 type usersOut struct {

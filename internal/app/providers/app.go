@@ -1,12 +1,12 @@
-package app
+package providers
 
 import (
 	"github.com/devemio/go-rest-api/internal/app/http/controllers"
-	users2 "github.com/devemio/go-rest-api/internal/domain/users"
-	"github.com/devemio/go-rest-api/internal/infrastructure/repositories/users"
+	"github.com/devemio/go-rest-api/internal/domain/users"
+	usersImpl "github.com/devemio/go-rest-api/internal/infrastructure/repositories/users"
 )
 
-type App struct {
+type app struct {
 	*Ctrls
 }
 
@@ -16,15 +16,15 @@ type Ctrls struct {
 }
 
 type _repos struct {
-	User users2.UserRepoContract
+	User users.UserRepo
 }
 
-func New() *App { // @fixme move
+func App() *app {
 	repos := &_repos{
-		User: &users.UserRepo{},
+		User: &usersImpl.UserRepo{},
 	}
 
-	return &App{
+	return &app{
 		Ctrls: &Ctrls{
 			Ping: &controllers.PingPongCtrl{},
 			User: &controllers.UserCtrl{
