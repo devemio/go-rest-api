@@ -1,8 +1,6 @@
-package routing
+package contracts
 
-import (
-	"net/http"
-)
+import "net/http"
 
 type Router interface {
 	Get(path string, handlerFunc http.HandlerFunc)

@@ -11,14 +11,21 @@ import (
 type In any
 type Out any
 
-func WrapGet[TOut Out](fn func(*http.Request) (TOut, error)) http.HandlerFunc {
+func WrapGet[TOut Out](fn func() (TOut, error)) http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
+		out, err := fn()
+		handle(w, req, out, err)
+	}
+}
+
+func WrapGetWithReq[TOut Out](fn func(*http.Request) (TOut, error)) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		out, err := fn(req)
 		handle(w, req, out, err)
 	}
 }
 
-func WrapPost[TIn In, TOut Out](fn func(*http.Request, TIn) (TOut, error)) http.HandlerFunc {
+func WrapPost[TIn In, TOut Out](fn func(TIn) (TOut, error)) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		bytes, err := io.ReadAll(req.Body)
 		if err != nil {
@@ -32,7 +39,7 @@ func WrapPost[TIn In, TOut Out](fn func(*http.Request, TIn) (TOut, error)) http.
 			return
 		}
 
-		out, err := fn(req, in)
+		out, err := fn(in)
 		handle(w, req, out, err)
 	}
 }
@@ -49,13 +56,15 @@ func handle(w http.ResponseWriter, req *http.Request, out Out, err error) {
 				})
 			}
 		default:
+			w.WriteHeader(http.StatusOK)
+
 			_ = json.NewEncoder(w).Encode(out)
 		}
 
 		return
 	}
 
-	var e *errBase
+	var e *Error
 	if errors.As(err, &e) {
 		w.WriteHeader(e.statusCode)
 
@@ -67,6 +76,7 @@ func handle(w http.ResponseWriter, req *http.Request, out Out, err error) {
 	}
 
 	internalServerError(w, errors.New("internal server error"))
+
 	fmt.Println("5xx response", req.Method, req.URL, err) // @fixme
 }
 

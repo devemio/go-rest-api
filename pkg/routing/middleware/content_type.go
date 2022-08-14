@@ -8,10 +8,10 @@ func NewContentType() *contentType {
 	return &contentType{}
 }
 
-func (m *contentType) Handle(next http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func (m *contentType) Handle(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 
-		next(w, r)
-	}
+		next.ServeHTTP(w, r)
+	})
 }

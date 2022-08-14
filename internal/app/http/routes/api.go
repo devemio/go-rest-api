@@ -1,16 +1,27 @@
 package routes
 
 import (
-	"github.com/devemio/go-rest-api/internal/infrastructure/ioc"
+	"net/http"
+
+	"github.com/devemio/go-rest-api/internal/infrastructure/app"
+	"github.com/devemio/go-rest-api/pkg/contracts"
 	"github.com/devemio/go-rest-api/pkg/handlers"
 	"github.com/devemio/go-rest-api/pkg/routing"
 )
 
-func Register(r routing.Router, app *ioc.App) {
-	r.Get("/ping", handlers.WrapGet(app.Ctrls.Ping.Ping))
+func Create() http.Handler {
+	router := routing.New()
 
-	r.Get("/users", handlers.WrapGet(app.Ctrls.User.Get))
-	r.Get("/users/{id}", handlers.WrapGet(app.Ctrls.User.Find))
-	r.Post("/users", handlers.WrapPost(app.Ctrls.User.Create))
-	r.Delete("/users/{id}", handlers.WrapGet(app.Ctrls.User.Delete))
+	register(router, app.New().Ctrls)
+
+	return router
+}
+
+func register(r contracts.Router, c *app.Ctrls) {
+	r.Get("/ping", handlers.WrapGet(c.Ping.Ping))
+
+	r.Get("/users", handlers.WrapGet(c.User.Get))
+	r.Get("/users/{id}", handlers.WrapGetWithReq(c.User.Find))
+	r.Post("/users", handlers.WrapPost(c.User.Create))
+	r.Delete("/users/{id}", handlers.WrapGetWithReq(c.User.Delete))
 }

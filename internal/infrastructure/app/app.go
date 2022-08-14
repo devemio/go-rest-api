@@ -1,9 +1,9 @@
-package ioc
+package app
 
 import (
 	"github.com/devemio/go-rest-api/internal/app/http/controllers"
-	"github.com/devemio/go-rest-api/internal/domain/users/repositories"
-	repoImpl "github.com/devemio/go-rest-api/internal/infrastructure/impl/repositories"
+	users2 "github.com/devemio/go-rest-api/internal/domain/users"
+	"github.com/devemio/go-rest-api/internal/infrastructure/repositories/users"
 )
 
 type App struct {
@@ -16,16 +16,16 @@ type Ctrls struct {
 }
 
 type _repos struct {
-	User repositories.UserRepoContract
+	User users2.UserRepoContract
 }
 
-func New() *App {
+func New() *App { // @fixme move
 	repos := &_repos{
-		User: &repoImpl.UserRepo{},
+		User: &users.UserRepo{},
 	}
 
 	return &App{
-		&Ctrls{
+		Ctrls: &Ctrls{
 			Ping: &controllers.PingPongCtrl{},
 			User: &controllers.UserCtrl{
 				Repo: repos.User,

@@ -1,13 +1,12 @@
-package repositories
+package users
 
 import (
-	"github.com/devemio/go-rest-api/internal/domain/users/models"
-	"github.com/devemio/go-rest-api/internal/domain/users/repositories"
+	domain "github.com/devemio/go-rest-api/internal/domain/users"
 )
 
 type UserRepo struct{}
 
-var users = []models.User{
+var users = []domain.User{
 	{
 		ID:           1,
 		Username:     "A",
@@ -20,21 +19,21 @@ var users = []models.User{
 	},
 }
 
-func (r *UserRepo) Get() ([]models.User, error) {
+func (r *UserRepo) Get() ([]domain.User, error) {
 	return users, nil
 }
 
-func (r *UserRepo) Find(id int64) (*models.User, error) {
+func (r *UserRepo) Find(id int64) (*domain.User, error) {
 	for _, user := range users {
 		if user.ID == id {
 			return &user, nil
 		}
 	}
 
-	return nil, repositories.ErrUserNotFound
+	return nil, domain.ErrUserNotFound
 }
 
-func (r *UserRepo) Save(user *models.User) error {
+func (r *UserRepo) Save(user *domain.User) error {
 	users = append(users, *user)
 
 	return nil
@@ -49,5 +48,5 @@ func (r *UserRepo) Delete(id int64) error {
 		}
 	}
 
-	return repositories.ErrUserNotFound
+	return domain.ErrUserNotFound
 }

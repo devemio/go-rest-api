@@ -1,19 +1,17 @@
 package controllers
 
 import (
-	"fmt"
 	"math/rand"
 	"net/http"
 	"strconv"
 
-	"github.com/devemio/go-rest-api/internal/domain/users/models"
-	"github.com/devemio/go-rest-api/internal/domain/users/repositories"
+	"github.com/devemio/go-rest-api/internal/domain/users"
 	"github.com/devemio/go-rest-api/pkg/handlers"
 	"github.com/devemio/go-rest-api/pkg/routing"
 )
 
 type UserCtrl struct {
-	Repo repositories.UserRepoContract
+	Repo users.UserRepoContract
 }
 
 type usersOut struct {
@@ -25,20 +23,20 @@ type userOut struct {
 	Username string `json:"username"`
 }
 
-func (c *UserCtrl) Get(*http.Request) (*usersOut, error) {
-	users, err := c.Repo.Get()
+func (c *UserCtrl) Get() (*usersOut, error) {
+	entities, err := c.Repo.Get()
 	if err != nil {
 		return nil, err
 	}
 
 	out := &usersOut{
-		Data: make([]userOut, 0, len(users)),
+		Data: make([]userOut, 0, len(entities)),
 	}
 
-	for _, u := range users {
+	for _, entity := range entities {
 		out.Data = append(out.Data, userOut{
-			ID:       u.ID,
-			Username: u.Username,
+			ID:       entity.ID,
+			Username: entity.Username,
 		})
 	}
 
@@ -53,14 +51,14 @@ func (c *UserCtrl) Find(r *http.Request) (*userOut, error) {
 		return nil, handlers.ErrValidation("id should be int")
 	}
 
-	user, err := c.Repo.Find(id)
+	entity, err := c.Repo.Find(id)
 	if err != nil {
-		return nil, handlers.MapToErr(err, repositories.ErrUserNotFound, handlers.ErrNotFound())
+		return nil, handlers.MapToErr(err, users.ErrUserNotFound, handlers.ErrNotFound())
 	}
 
 	return &userOut{
-		ID:       user.ID,
-		Username: user.Username,
+		ID:       entity.ID,
+		Username: entity.Username,
 	}, nil
 }
 
@@ -68,28 +66,26 @@ type createUserIn struct {
 	Username string `json:"username"`
 }
 
-func (c *UserCtrl) Create(_ *http.Request, in *createUserIn) (*handlers.Response, error) {
-	fmt.Println("IN", in)
-
+func (c *UserCtrl) Create(in *createUserIn) (*handlers.Response, error) {
 	id := rand.Int63()
-	user := &models.User{
+	entity := &users.User{
 		ID:           id,
 		Username:     in.Username,
 		EmailAddress: in.Username + "@gmail.com",
 	}
 
-	if err := c.Repo.Save(user); err != nil {
+	if err := c.Repo.Save(entity); err != nil {
 		return nil, err
 	}
 
-	user, err := c.Repo.Find(id)
+	entity, err := c.Repo.Find(id)
 	if err != nil {
 		return nil, err
 	}
 
 	return handlers.ResCreated(&userOut{
-		ID:       user.ID,
-		Username: user.Username,
+		ID:       entity.ID,
+		Username: entity.Username,
 	}), nil
 }
 
@@ -102,7 +98,7 @@ func (c *UserCtrl) Delete(r *http.Request) (*handlers.Response, error) {
 	}
 
 	if err = c.Repo.Delete(id); err != nil {
-		return nil, handlers.MapToErr(err, repositories.ErrUserNotFound, handlers.ErrNotFound())
+		return nil, handlers.MapToErr(err, users.ErrUserNotFound, handlers.ErrNotFound())
 	}
 
 	return handlers.ResNoContent(), nil

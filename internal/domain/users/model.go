@@ -1,11 +1,7 @@
 package users
 
 type User struct {
-	Id           int
+	ID           int64
 	Username     string
 	EmailAddress string
-}
-
-func New() *User {
-	return &User{}
 }
