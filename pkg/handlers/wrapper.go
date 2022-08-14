@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type In any
@@ -77,7 +79,11 @@ func handle(w http.ResponseWriter, req *http.Request, out Out, err error) {
 
 	internalServerError(w, errors.New("internal server error"))
 
-	fmt.Println("5xx response", req.Method, req.URL, err) // @fixme
+	log.WithFields(log.Fields{
+		"err":    err,
+		"url":    req.URL,
+		"method": req.Method,
+	}).Error("5xx response")
 }
 
 func internalServerError(w http.ResponseWriter, err error) {
