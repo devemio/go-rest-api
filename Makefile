@@ -2,4 +2,4 @@
 .DEFAULT_GOAL := build
 
 build:
-	@go build -v ./cmd/api
+	@go build -v ./cmd/service
